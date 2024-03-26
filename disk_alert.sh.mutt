@@ -1,0 +1,15 @@
+#!/bin/sh
+# Set admin email so that you can get email.
+ADMIN="soporte@nts.com.py,luis.capdevila@nts.com.py"
+# set alert level 92% is default
+ALERT=92
+df -H | grep -vE '^Filesystem|tmpfs|cdrom' | awk '{ print $5 " " $1 }' | while read output;
+do
+  echo $output
+  usep=$(echo $output | awk '{ print $1}' | cut -d'%' -f1  )
+  partition=$(echo $output | awk '{ print $2 }' )
+  if [ $usep -ge $ALERT ]; then
+    echo "El disco se esta quedando sin espacio \"$partition ($usep%)\" on $(hostname) as on $(date)" |
+     mutt -s "Alerta: Disco sin Espacio $usep%" $ADMIN
+  fi
+done
